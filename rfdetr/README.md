@@ -1,245 +1,303 @@
-# RF-DETR API Perfect Wrapper
+# 🚀 RF-DETR FastAPI Wrapper
 
-This ZIP contains a modular FastAPI wrapper for your RF-DETR notebook/model.
+A production-ready **FastAPI wrapper** for the **RF-DETR Object Detection** model with support for images, videos, webcams, and live RTSP/IP camera streams.
 
-It supports:
+## ✨ Features
 
-- Images: `jpg`, `jpeg`, `png`, `bmp`, `webp`, `tiff`, `tif`
-- Videos: `mp4`, `avi`, `mov`, `mkv`
-- Live streams: RTSP, RTMP, webcam, IP camera
-- Resolutions: 480p, 720p, 1080p, 2K, 4K, 8K
-- Automatic resize/compression before inference
-- Original-size bounding box scaling
-- Annotated image/video output
-- Swagger UI at `/docs`
+- 📷 Image Detection (`jpg`, `jpeg`, `png`, `bmp`, `webp`, `tiff`, `tif`)
+- 🎥 Video Detection (`mp4`, `avi`, `mov`, `mkv`)
+- 📡 RTSP / RTMP / IP Camera Stream Support
+- 🎦 Webcam Inference
+- 🖥️ Supports 480p, 720p, 1080p, 2K, 4K & 8K Inputs
+- ⚡ Automatic Image Resize & Optimization
+- 🎯 Original Resolution Bounding Box Scaling
+- 📝 Annotated Image & Video Output
+- 📊 REST API with Swagger Documentation
+- 🚀 FastAPI + Uvicorn Server
+- 🔍 Health Check Endpoint
 
 ---
 
-## Correct folder structure
-
-Extract/copy the contents of this ZIP directly inside your RF-DETR project root.
-
-Final structure should look like this:
+# 📂 Project Structure
 
 ```text
-rfdetr/
+RF-DETR-API/
+│
 ├── api/
-│   ├── main.py
 │   ├── core/
 │   ├── routes/
-│   ├── services/
 │   ├── schemas/
-│   └── utils/
-├── run_api.py
-├── api.py
-├── requirements_api.txt
-├── start_api_windows.bat
-├── test_requests.py
+│   ├── services/
+│   ├── utils/
+│   └── main.py
+│
 ├── outputs/
 │
 ├── utils/
-│   └── inference.py      <-- your original RF-DETR inference file
-├── configs/
-│   └── config.json       <-- your original config
-└── rfdetr_pipeline.ipynb
+│   └── inference.py
+│
+├── api.py
+├── run_api.py
+├── test_requests.py
+├── requirements.txt
+├── requirements_api.txt
+├── start_api_windows.bat
+├── README.md
+└── test.webp
 ```
-
-Important:
-
-There are two different `utils` folders:
-
-```text
-api/utils/         -> API helper files
-utils/inference.py -> your original RF-DETR model wrapper
-```
-
-The API expects your notebook import to work:
-
-```python
-from utils.inference import RFDETRInference
-```
-
-If this file is missing, the server will still start, but `/detect` will return a clear model loading error.
 
 ---
 
-## Install
+# ⚙️ Requirements
 
-```powershell
-cd C:\Users\aj985\OneDrive\Desktop\rfdetr
-python -m pip install -r requirements_api.txt
+- Python 3.10+
+- FastAPI
+- Uvicorn
+- OpenCV
+- NumPy
+- RF-DETR Model
+- PyTorch
+
+Install all dependencies:
+
+```bash
+pip install -r requirements_api.txt
 ```
 
-If you already use a virtual environment, activate it first.
+or
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
-## Run
+# ▶️ Running the API
 
-Recommended:
+### Option 1 (Recommended)
 
-```powershell
+```bash
 python run_api.py
 ```
 
-Alternative:
+### Option 2
 
-```powershell
-uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+```bash
+uvicorn api.main:app --reload
 ```
 
-Or double-click:
+### Option 3 (Windows)
+
+Double-click:
 
 ```text
 start_api_windows.bat
 ```
 
-Open:
+---
 
-```text
-http://127.0.0.1:8000/docs
+# 🌐 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/docs` | GET | Swagger UI |
+| `/health` | GET | Health Check |
+| `/detect` | POST | Detect Objects in Images |
+| `/detect/video` | POST | Video Detection |
+| `/detect/stream` | POST | RTSP/IP Camera Detection |
+| `/detect/webcam` | POST | Webcam Detection |
+| `/detect/live` | GET | Live MJPEG Stream |
+
+---
+
+# 📷 Image Detection
+
+### cURL
+
+```bash
+curl -X POST "http://127.0.0.1:8000/detect" \
+-F "file=@image.jpg" \
+-F "threshold=0.5" \
+-F "return_annotated=true"
 ```
 
-Health check:
+### Python
 
-```text
-http://127.0.0.1:8000/health
+```bash
+python test_requests.py --image image.jpg
 ```
 
 ---
 
-## Test image
+# 🎥 Video Detection
 
-PowerShell:
-
-```powershell
-curl.exe -X POST "http://127.0.0.1:8000/detect" `
-  -F "file=@test.jpg" `
-  -F "threshold=0.5" `
-  -F "return_annotated=true"
-```
-
-Python:
-
-```powershell
-python test_requests.py --image test.jpg
+```bash
+curl -X POST "http://127.0.0.1:8000/detect/video" \
+-F "file=@video.mp4" \
+-F "threshold=0.5" \
+-F "return_annotated=true"
 ```
 
 ---
 
-## Test video
+# 📡 RTSP / IP Camera
 
-```powershell
-curl.exe -X POST "http://127.0.0.1:8000/detect" `
-  -F "file=@video.mp4" `
-  -F "threshold=0.5" `
-  -F "max_frames=100" `
-  -F "return_annotated=true"
+```bash
+curl -X POST "http://127.0.0.1:8000/detect/stream" \
+-H "Content-Type: application/json" \
+-d "{\"source\":\"rtsp://username:password@192.168.1.10:554/stream1\",\"threshold\":0.5}"
 ```
 
 ---
 
-## Test RTSP / IP camera
+# 🎦 Webcam Detection
 
-```powershell
-curl.exe -X POST "http://127.0.0.1:8000/detect/stream" `
-  -H "Content-Type: application/json" `
-  -d "{\"source\":\"rtsp://username:password@192.168.1.10:554/stream1\",\"threshold\":0.5,\"max_frames\":100}"
+```bash
+curl -X POST "http://127.0.0.1:8000/detect/webcam?camera_index=0"
+```
+
+Live Browser Preview
+
+```
+http://127.0.0.1:8000/detect/live?source=0
 ```
 
 ---
 
-## Test webcam
+# 📊 Supported Input Formats
 
-```powershell
-curl.exe -X POST "http://127.0.0.1:8000/detect/webcam?camera_index=0&threshold=0.5&max_frames=100"
+## Images
+
+- JPG
+- JPEG
+- PNG
+- BMP
+- WEBP
+- TIFF
+- TIF
+
+## Videos
+
+- MP4
+- AVI
+- MOV
+- MKV
+
+---
+
+# 🖥️ High Resolution Support
+
+The API safely processes:
+
+- ✅ 480p
+- ✅ 720p
+- ✅ 1080p
+- ✅ 2K
+- ✅ 4K
+- ✅ 8K
+
+Workflow:
+
+```
+Original Image
+        │
+        ▼
+Automatic Resize
+        │
+        ▼
+RF-DETR Prediction
+        │
+        ▼
+Scale Bounding Boxes
+        │
+        ▼
+Annotated Output
 ```
 
-Live MJPEG browser preview:
+---
+
+# 📁 Output
+
+Processed files are automatically saved inside:
 
 ```text
-http://127.0.0.1:8000/detect/live?source=0&threshold=0.5
+outputs/
 ```
+
+Depending on the request, the API returns:
+
+- Detection JSON
+- Annotated Images
+- Annotated Videos
 
 ---
 
-## Why 4K/8K will not crash directly
+# 🛠 Configuration
 
-The API does not feed full 4K/8K images directly to the model.
-
-Flow:
+Default resize values:
 
 ```text
-Original 4K/8K image
-↓
-Resize to safe model size
-↓
-Run RF-DETR prediction
-↓
-Scale detection boxes back to original resolution
-↓
-Return JSON
+MAX_IMAGE_SIDE = 1920
+MAX_VIDEO_SIDE = 1280
 ```
 
-Config defaults:
-
-```text
-MAX_IMAGE_SIDE=1920
-MAX_VIDEO_SIDE=1280
-```
-
-You can change them in `.env`.
+These values can be modified according to your hardware capabilities.
 
 ---
 
-## Common issue: No module named utils.inference
+# ⚠️ Common Issue
 
-This means your original RF-DETR inference file is missing.
+### ModuleNotFoundError
 
-Expected file:
-
-```text
-rfdetr/utils/inference.py
+```
+No module named 'utils.inference'
 ```
 
-Expected class:
+Ensure your project contains:
+
+```text
+utils/
+└── inference.py
+```
+
+with a class similar to:
 
 ```python
 class RFDETRInference:
     ...
 ```
 
-Expected predict call:
+If your inference file has a different name, update the import inside:
 
-```python
-model.predict(image, threshold=0.5)
 ```
-
-If your actual model file/class has another name, edit:
-
-```text
 api/core/model.py
 ```
 
-and change the loader.
+---
+
+# 📖 API Documentation
+
+After starting the server, open:
+
+```
+http://127.0.0.1:8000/docs
+```
+
+Swagger UI provides interactive API testing for all endpoints.
 
 ---
 
-## PowerShell profile error fix
+# ❤️ Built With
 
-If PowerShell shows an error like:
+- FastAPI
+- Uvicorn
+- PyTorch
+- OpenCV
+- NumPy
+- RF-DETR
 
-```text
-Microsoft.PowerShell_profile.ps1
-series1=pd.Series([2,4,6,8,10,12])
-```
+---
 
-You pasted Python code into PowerShell profile by mistake.
+# 📜 License
 
-Fix:
-
-```powershell
-notepad $PROFILE
-```
-
-Delete the Python line, save, close PowerShell, reopen it.
+This project is intended for research, learning, and production deployment with RF-DETR-based object detection systems.
